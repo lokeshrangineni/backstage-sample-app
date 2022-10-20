@@ -1,0 +1,70 @@
+# kubernetes/postgres.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: lokesh-backstage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      # initContainers:
+      #   - name: volume-mount-hack
+      #     image: quay.io/lrangine/busybox
+      #     command: ["sh", "-c", "whoami && chown -R 1000840000:1000840000 /var/lib/postgresql/data/"]
+      #     securityContext:
+      #       allowPrivilegeEscalation: true
+      #       runAsUser: 0
+      #       #readOnlyRootFilesystem: true
+      #       capabilities:
+      #         add: ["SYS_ADMIN"]
+      #     volumeMounts:
+      #       - name: postgresdb
+      #         mountPath: /var/lib/postgresql/data
+
+      # initContainers:
+      #   - name: change-ownership-container
+      #     image: busybox
+      #     command: ["sh", "-c", "chown -R 1000840000:0 /var/lib/postgresql/data"]
+      #     volumeMounts:
+      #       - mountPath: /var/lib/postgresql/data            
+      #         name: postgresdb   
+      securityContext:
+        allowPrivilegeEscalation: true
+        runAsUser: 0
+        #readOnlyRootFilesystem: true
+        capabilities:
+          add: ["SYS_ADMIN"]      
+        
+      containers:
+        - name: postgres
+          image: quay.io/lrangine/postgres
+          imagePullPolicy: 'IfNotPresent'
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - secretRef:
+                name: postgres-secrets
+          volumeMounts:
+            - mountPath: /root/pgdata
+              #subPath: pgdata
+              name: postgresdb    
+        # - name: run-shell
+        #   image: quay.io/lrangine/busybox           
+        #   command:
+        #     - /bin/sh
+        #     - -c
+        #     - echo "lokesh debug2" && who && sleep 10m
+        #   volumeMounts:
+        #     - mountPath: /root/pgdata            
+        #       name: postgresdb 
+      volumes:
+        - name: postgresdb
+          persistentVolumeClaim:
+            claimName: postgres-storage-claim

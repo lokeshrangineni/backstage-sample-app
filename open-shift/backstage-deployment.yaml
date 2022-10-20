@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backstage
+  namespace: lokesh-backstage
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backstage
+  template:
+    metadata:
+      labels:
+        app: backstage
+    spec:
+      securityContext:
+        runAsUser: 0
+        fsGroup: 0 
+      containers:
+        - name: backstage
+          image: quay.io/lrangine/backstage:14.0
+          imagePullPolicy: IfNotPresent
+          #command: ["sleep 36000 && whoami"]
+          # args:          
+          #   - "sleep"
+          #   - "36000"
+          ports:
+            - name: http
+              containerPort: 7007
+          envFrom:
+            - secretRef:
+                name: postgres-secrets
+            - secretRef:
+                name: backstage-secrets
+# Uncomment if health checks are enabled in your app:
+# https://backstage.io/docs/plugins/observability#health-checks
