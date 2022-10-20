@@ -1,8 +1,6 @@
 # [Backstage](https://backstage.io)
 
-This is your newly scaffolded Backstage App, Good Luck!
-
-Use below commands to build docker image for the application from root directory.
+Use below commands to build docker image. Run these commands from root directory.
 
 ```shell
 podman image build . -f packages/backend/Dockerfile --tag backstage-sample-app
@@ -10,7 +8,7 @@ podman image tag localhost/backstage-sample-app:latest quay.io/lrangine/backstag
 podman image push quay.io/lrangine/backstage-sample-app:1.0
 ```
 
-Use below commands to run the application using docker image. This docker image is expected to connect to postgres database running on another database in the same host. 
+Use below commands to run the application using docker image. This docker image is expected to connect to postgres database running on the same host. 
 
 ```shell
 # run postgres database
